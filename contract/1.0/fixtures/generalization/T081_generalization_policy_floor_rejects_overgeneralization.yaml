@@ -1,0 +1,63 @@
+id: T081_generalization_policy_floor_rejects_overgeneralization
+category: Generalization
+operation: processDocument
+processorCapabilities:
+  - blue-contracts-fixture-scripted-runtime-v1
+  - blue-contracts-fixture-type-graph-v1
+typeGraph:
+  PayNote:
+    blueId: GuYxgHX6eCjvgoXnvrJKFmpPbVGJ3GSBLfDdhArqpspe
+  BankTransferPayNote:
+    blueId: GeDgB3LzDSRhNJH6PD5wwZAVtVDfCZhqXxWzEY3ctWHF
+    parent: PayNote
+  EUBankTransferPayNote:
+    blueId: 95ykwi5Gh48Pp5GJzEAhkjgjnH8fFs8jWiXi3ccWDTWq
+    parent: BankTransferPayNote
+    fixedValues:
+      /rail: SEPA
+initialDocument:
+  type:
+    blueId: 95ykwi5Gh48Pp5GJzEAhkjgjnH8fFs8jWiXi3ccWDTWq
+  rail: SEPA
+  amount: 10
+  contracts:
+    generalization:
+      type:
+        blueId: Fbenow6tanFHkWzKiDD8fGxminQswQ1FecMRakaCx2WX
+      rules:
+        - path: /
+          mode: nearest-valid
+          mustRemainSubtypeOf:
+            blueId: GeDgB3LzDSRhNJH6PD5wwZAVtVDfCZhqXxWzEY3ctWHF
+    incoming:
+      type:
+        blueId: C37UoAfTNUnoxkB2CdEE7BfHJwYqTNiWzQb5xuRMkBzm
+    patcher:
+      type:
+        blueId: 2TwRC3EdLXk4gqwyyVWy52h5BQ5ntrkmpcrhrTxsGAs1
+      channel: incoming
+event:
+  kind: change-rail
+mockRuntime:
+  channels:
+    - contract: /contracts/incoming
+      calls:
+        - when:
+            event:
+              kind: change-rail
+          accepted: true
+          payload:
+            kind: change-rail
+  handlers:
+    - contract: /contracts/patcher
+      calls:
+        - when:
+            channelKey: incoming
+          result:
+            patches:
+              - op: replace
+                path: /rail
+                val: CARD
+expectedStatus: runtime-fatal
+expectedErrorCategories: [GeneralizationRejected, GeneralizationNoValidType]
+expectedNoDocumentMutation: true
