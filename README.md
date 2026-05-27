@@ -4,14 +4,22 @@ This repository contains the normative specifications for Blue 1.0.
 
 ## Specifications
 
-- [Blue Language Specification 1.0](language/1.0/spec.md)  
+- [Blue Language Specification 1.0](specifications/language/1.0/spec.md)  
   Defines the Blue data model, graph and document model, preprocessing, type resolution, schema constraints, list semantics, canonicalization, and BlueId calculation.
 
-- [Blue Contract Specification 1.0](contract/1.0/spec.md)  
+- [Blue Contracts and Processor Specification 1.0](specifications/contracts/1.0/spec.md)  
   Defines Blue contract semantics and runtime contract processing.
 
-- [Blue BEX Specification 1.0](bex/1.0/spec.md)  
+- [Blue BEX Specification 1.0](specifications/bex/1.0/spec.md)  
   Defines Blue BEX encoding and interoperability rules.
+
+## Packages
+
+- [Blue Coordination Package 1.0](packages/coordination/1.0/spec.md)  
+  Defines Blue Timelines and Conversation coordination semantics.
+
+- [Blue PayNote Package 1.0](packages/paynote/1.0/spec.md)  
+  Defines the PayNote package for transaction-governance documents.
 
 ## Status
 
