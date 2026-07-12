@@ -991,6 +991,12 @@ Each schema keyword applies only to the effective node kind for which it is defi
 
 If a schema keyword is evaluated against an incompatible effective node kind, validation MUST fail with a schema violation. Implementations MUST NOT silently ignore incompatible schema keywords.
 
+A semantically absent child under section 9.2.3 has no effective payload
+kind. Payload-dependent schema keywords other than `required` are not
+evaluated until the child is semantically present. This is distinct from a
+semantically present node whose payload kind is incompatible with a schema
+keyword; that node MUST fail with `SchemaViolation`.
+
 ### 9.2.3 Required fields (normative)
 
 `required: true` on a child field declaration requires that the field be semantically present in resolved descendants.
@@ -1002,6 +1008,11 @@ A required field is satisfied only if the resolved child node contains at least 
 - an object payload with at least one ordinary child field;
 - a pure reference;
 - a fixed payload or fixed subtree inherited from an ancestor type.
+
+For object presence, an ordinary child field is counted after object-field
+cleaning and is not recursively conditioned on that child's own semantic
+payload. A retained ordinary child makes the parent object payload present.
+Schema constraints attached to the child are validated independently.
 
 A metadata-only child declaration, such as a node containing only `type`, `schema`, `name`, or `description`, does not by itself satisfy `required: true`.
 
@@ -2369,12 +2380,8 @@ The Blue Language 1.0 release authority MUST publish the fixture package identit
 The fixture package identity for this Blue Language 1.0 publication is:
 
 ```text
-sha256:1a85170f98a980e1cd05906eee7a82779a8a444a413f70ee40a7856018f91b54
+sha256:e4017fef531dafcda0477cb539170ce30cd15fe81d9c499d23e4104f92e97d0e
 ```
-
-On a corrective candidate branch, this value identifies the candidate fixture
-package for unchanged Blue Language 1.0 semantics. It does not by itself
-publish, merge, tag, or release that candidate as the official specification.
 
 No inline reference BlueIds are included in this prose specification. Exact hashes live in the canonical fixture package.
 
@@ -2403,43 +2410,61 @@ expectedCanonicalIdentityInput: ...
 expectedContentBlueId: "<blueId>"
 ```
 
-Stateful cache-history and provenance behavior uses a scenario fixture. All
-steps in a scenario execute in order against one resolver instance and one
-fixed provider:
+`operation: scenario` is a fixture-harness operation, not Blue content. Steps
+execute in listed order against one resolution context and one fixed provider
+state. A cacheless implementation is conforming; fixtures assert results,
+never whether or when a cache is populated.
+
+Supported actions are exactly `resolve`, `canonicalize`, and
+`calculateContentBlueId`. `resolveToSnapshot` is not a portable action, and
+`expectedProvenance` is not a portable assertion.
+
+Successful scenario steps use these action-specific assertions:
+
+- `resolve` requires `expectedResolved` or a non-empty
+  `expectedResolvedPaths` list.
+- `canonicalize` requires `expectedCanonicalOverlay`. If it also declares
+  `expectedContentBlueId`, the runner computes the direct Node BlueId of the
+  actual canonical result and compares it to that value.
+- `calculateContentBlueId` requires `expectedContentBlueId`.
+- A successful step may declare only assertions supported by its action.
+
+`expectedResolved`, each `expectedResolvedPaths[].expectedNode`, and
+`expectedCanonicalOverlay` use exact structural Blue-node equality after both
+actual and expected YAML are deserialized into the fixture's Blue node model.
+Every reserved field, payload field, and ordinary property MUST match, list
+order MUST match, and an omitted field is expected to be absent. `expectedNode`
+is not a subset, pattern, or overlay. No resolution or canonicalization is
+applied to the expected node before comparison.
+
+`expectedResolvedPaths[].path` is an RFC 6901 path into the actual Resolved
+View. The empty string selects the root.
+
+An error step declares `expectError: true` and exactly one of
+`expectedErrorCategory` or `expectedErrorCategories`. It declares no
+success-output assertion. The observed failure MUST be a deterministic
+language failure in the declared category. Stack overflow, resource
+exhaustion, timeout, and host-runtime failures are fixture failures and never
+satisfy `expectError`.
+
+For example:
 
 ```yaml
-id: R_cache_history_example
-category: Canonicalization
+id: F_reference_identity_then_typed_resolution
+category: Provider
 operation: scenario
 provider: [...]
 steps:
-- action: resolveToSnapshot
-  source: ...
-  expectedCanonicalOverlay: ...
-  expectedContentBlueId: "<blueId>"
-  expectedProvenance:
-  - path: ""
-    expectedKinds: [source-reference]
+- action: calculateContentBlueId
+  source:
+    blueId: X
+  expectedContentBlueId: X
 - action: resolve
   source: ...
   expectedResolvedPaths:
   - path: /subject/identifier
     expectedNode: ...
 ```
-
-Scenario actions are limited to `resolve`, `resolveToSnapshot`, `canonicalize`,
-and `calculateContentBlueId`. Each step declares its own expected output or
-deterministic language error. Supported assertions are `expectedResolved`,
-`expectedResolvedPaths`, `expectedCanonicalOverlay`, `expectedContentBlueId`,
-and `expectedProvenance` at RFC 6901 paths. Provenance expectations use
-portable terms such as `source-reference`, `instance-supplied`, and
-`provider-materialized`; they do not name implementation fields.
-
-An implementation adapter MUST evaluate `expectedProvenance` from provenance
-persisted with the snapshot. It MUST NOT infer the answer from the fixture
-source or Canonical Identity Input. `StackOverflowError`, `OutOfMemoryError`,
-timeouts, and other virtual-machine failures are fixture failures and never
-satisfy an expected language error.
 
 Error fixtures MAY include:
 
@@ -2955,7 +2980,7 @@ When an operation fails deterministically, implementations MUST be able to class
 | `InvalidBlueId` | A BlueId string is malformed or invalid for its context. |
 | `InvalidReferenceShape` | `blueId` appears with sibling fields or invalid mixed reference shape. |
 | `InvalidBlueIdInput` | Direct Node BlueId received a node that is not valid BlueId Input. |
-| `ProviderUnavailable` | Required provider content is unavailable. |
+| `ProviderUnavailable` | Required provider content is missing, cannot be materialized, or returns only references without making materialization progress. |
 | `ProviderBlueIdMismatch` | Provider content does not verify against the requested BlueId. |
 | `TypeCycle` | Resolution detected a type-cycle in the active type stack. |
 | `FixedValueConflict` | A descendant attempted to override or contradict an inherited fixed value. |

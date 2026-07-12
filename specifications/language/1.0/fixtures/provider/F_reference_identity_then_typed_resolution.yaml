@@ -1,7 +1,7 @@
-id: F_snapshot_reference_then_typed_resolution
+id: F_reference_identity_then_typed_resolution
 category: Provider
 operation: scenario
-description: a root reference snapshot does not certify provider content needed by a later typed use
+description: an identity-only use of a pure reference does not certify content required by a later typed use
 provider:
 - requestedBlueId: vWaf5a4SM9DLWTVhuqLrj9uihL5TFZfEJUxPu8bRC5m
   returnedNode:
@@ -21,10 +21,8 @@ provider:
       schema:
         required: true
 steps:
-- action: resolveToSnapshot
+- action: calculateContentBlueId
   source:
-    blueId: EZjMCm64sChaawC4hqoiANWphWxW3mzmWaDUEwauBiW5
-  expectedCanonicalOverlay:
     blueId: EZjMCm64sChaawC4hqoiANWphWxW3mzmWaDUEwauBiW5
   expectedContentBlueId: EZjMCm64sChaawC4hqoiANWphWxW3mzmWaDUEwauBiW5
 - action: resolve

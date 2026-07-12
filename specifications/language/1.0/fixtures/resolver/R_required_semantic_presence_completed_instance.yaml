@@ -1,7 +1,7 @@
 id: R_required_semantic_presence_completed_instance
 category: Schema
 operation: scenario
-description: required validates completed semantic presence rather than declaration metadata
+description: required follows section 9.2.3 semantic presence on completed resolved nodes
 provider:
 - requestedBlueId: vWaf5a4SM9DLWTVhuqLrj9uihL5TFZfEJUxPu8bRC5m
   returnedNode:
@@ -53,8 +53,13 @@ steps:
         blueId: GX7CFUmSDrE2MzptunLCCdZwnuwwrenRQqEnHL4x3uoC
       value: present
       schema: {required: true}
+  - path: /emptyList
+    expectedNode:
+      items: []
+      schema: {required: true}
   - path: /subject/identifier
-    expectedNode: {value: subject-1}
+    expectedNode:
+      value: subject-1
 - action: resolve
   source:
     type:
@@ -83,8 +88,6 @@ steps:
     field:
       description: metadata only
 - action: resolve
-  expectError: true
-  expectedErrorCategory: SchemaViolation
   source:
     type:
       field:
@@ -92,6 +95,10 @@ steps:
     field:
       nested:
         description: declaration only
+  expectedResolvedPaths:
+  - path: /field/nested
+    expectedNode:
+      description: declaration only
 - action: resolve
   expectError: true
   expectedErrorCategory: SchemaViolation

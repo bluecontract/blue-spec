@@ -1,5 +1,5 @@
 specVersion: '1.0'
-fixturePackageIdentity: sha256:1a85170f98a980e1cd05906eee7a82779a8a444a413f70ee40a7856018f91b54
+fixturePackageIdentity: sha256:e4017fef531dafcda0477cb539170ce30cd15fe81d9c499d23e4104f92e97d0e
 fixtures:
 - id: L_no_profile_era_language_conformance_terms
   category: DocumentationLint
@@ -232,9 +232,9 @@ fixtures:
 - id: R_schema_wrong_kind_keywords_rejected
   category: Schema
   path: resolver/R_schema_wrong_kind_keywords_rejected.yaml
-- id: F_snapshot_reference_then_typed_resolution
+- id: F_reference_identity_then_typed_resolution
   category: Provider
-  path: provider/F_snapshot_reference_then_typed_resolution.yaml
+  path: provider/F_reference_identity_then_typed_resolution.yaml
 - id: R_cache_history_reference_then_materialized
   category: Canonicalization
   path: resolver/R_cache_history_reference_then_materialized.yaml
