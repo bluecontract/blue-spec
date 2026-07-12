@@ -2369,8 +2369,12 @@ The Blue Language 1.0 release authority MUST publish the fixture package identit
 The fixture package identity for this Blue Language 1.0 publication is:
 
 ```text
-sha256:8b79cdbba2167db7e24badcd55467819cd3c24b9caf256e8af08e093b9b564db
+sha256:1a85170f98a980e1cd05906eee7a82779a8a444a413f70ee40a7856018f91b54
 ```
+
+On a corrective candidate branch, this value identifies the candidate fixture
+package for unchanged Blue Language 1.0 semantics. It does not by itself
+publish, merge, tag, or release that candidate as the official specification.
 
 No inline reference BlueIds are included in this prose specification. Exact hashes live in the canonical fixture package.
 
@@ -2398,6 +2402,44 @@ provider: ...
 expectedCanonicalIdentityInput: ...
 expectedContentBlueId: "<blueId>"
 ```
+
+Stateful cache-history and provenance behavior uses a scenario fixture. All
+steps in a scenario execute in order against one resolver instance and one
+fixed provider:
+
+```yaml
+id: R_cache_history_example
+category: Canonicalization
+operation: scenario
+provider: [...]
+steps:
+- action: resolveToSnapshot
+  source: ...
+  expectedCanonicalOverlay: ...
+  expectedContentBlueId: "<blueId>"
+  expectedProvenance:
+  - path: ""
+    expectedKinds: [source-reference]
+- action: resolve
+  source: ...
+  expectedResolvedPaths:
+  - path: /subject/identifier
+    expectedNode: ...
+```
+
+Scenario actions are limited to `resolve`, `resolveToSnapshot`, `canonicalize`,
+and `calculateContentBlueId`. Each step declares its own expected output or
+deterministic language error. Supported assertions are `expectedResolved`,
+`expectedResolvedPaths`, `expectedCanonicalOverlay`, `expectedContentBlueId`,
+and `expectedProvenance` at RFC 6901 paths. Provenance expectations use
+portable terms such as `source-reference`, `instance-supplied`, and
+`provider-materialized`; they do not name implementation fields.
+
+An implementation adapter MUST evaluate `expectedProvenance` from provenance
+persisted with the snapshot. It MUST NOT infer the answer from the fixture
+source or Canonical Identity Input. `StackOverflowError`, `OutOfMemoryError`,
+timeouts, and other virtual-machine failures are fixture failures and never
+satisfy an expected language error.
 
 Error fixtures MAY include:
 
