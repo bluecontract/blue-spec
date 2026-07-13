@@ -52,4 +52,3 @@ steps:
   - path: /pet/type/owner/type/pet/type
     expectedNode:
       blueId: ENCwyUPUcBhZSYt7ho4Hyjm6iPGC1JrqdBhvJRFPgwFz#0
-
