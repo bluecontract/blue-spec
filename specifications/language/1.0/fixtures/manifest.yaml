@@ -1,5 +1,5 @@
 specVersion: '1.0'
-fixturePackageIdentity: sha256:32894216afaf9c9bf516920c377d15f037d0a76e15a45026c558288bd9ed132d
+fixturePackageIdentity: sha256:09aca50ad56542541b156a2af0729ef239b83cd47930a34d2fb331184b014782
 fixtures:
 - id: L_no_profile_era_language_conformance_terms
   category: DocumentationLint
@@ -283,3 +283,6 @@ fixtures:
 - id: R_recursive_structural_instance_validation
   category: Resolution
   path: resolver/R_recursive_structural_instance_validation.yaml
+- id: R_recursive_optional_branch_defers_required_descendants
+  category: Resolution
+  path: resolver/R_recursive_optional_branch_defers_required_descendants.yaml
