@@ -2380,7 +2380,7 @@ The Blue Language 1.0 release authority MUST publish the fixture package identit
 The fixture package identity for this Blue Language 1.0 publication is:
 
 ```text
-sha256:420fa58846b32f7f3075bbdb8fd757bb8fafce6d84297cda5794240e62869b73
+sha256:226fc29d2c0977bda8d1908171fc00b4b8f2e86141501cc3d4c03d69a5fc224b
 ```
 
 No inline reference BlueIds are included in this prose specification. Exact hashes live in the canonical fixture package.
